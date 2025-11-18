@@ -12,26 +12,28 @@ class Index:
         self.set = set()
 
     def add_document(self, document: str):
-        document = preprocess(document)
         if document in self.set:
             return
         self.documents.append(document)
         self.set.add(document)
+
+        document = preprocess(document)
+
         embedding = np.array([normalize(encode(document))]).astype('float32')
         self.index.add(embedding)
 
     def remove_document(self, document: str):
-        document = preprocess(document)
-        
         if document not in self.set:
             print(f"Document not found: {document}")
             return
 
         self.documents.remove(document)
         self.set.remove(document)
+
         self.index = faiss.IndexFlatIP(768)
 
         for doc in self.documents:
+            doc = preprocess(doc)
             embedding = np.array([normalize(encode(doc))]).astype('float32')
             self.index.add(embedding)
 

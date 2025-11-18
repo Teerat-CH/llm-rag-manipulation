@@ -19,6 +19,9 @@ class RAG:
         response = generate_response(prompt, model=model)
         return response
     
+    def retrieve_documents(self, user_query: str, k=5):
+        return self.index.search(user_query, k)
+    
 if __name__ == "__main__":
     rag_system = RAG()
     rag_system.index.reset_index()
