@@ -1,5 +1,5 @@
 import os
-from encode import preprocess, encode, normalize
+from .encode import preprocess, encode, normalize
 import pickle
 import faiss
 
@@ -13,7 +13,6 @@ class Index:
 
     def add_document(self, document: str):
         document = preprocess(document)
-        print(document)
         if document in self.set:
             return
         self.documents.append(document)
