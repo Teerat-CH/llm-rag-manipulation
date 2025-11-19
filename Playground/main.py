@@ -35,15 +35,18 @@ if TEXT_KEY not in st.session_state:
 if OUTPUT_KEY not in st.session_state:
     st.session_state[OUTPUT_KEY] = "Output will appear here after submission."
 
+st.session_state['k'] = 5
+
 def handle_reset_click():
     st.session_state[TEXT_KEY] = RESET_TEXT
     st.session_state[OUTPUT_KEY] = "Output will appear here after submission."
     st.session_state["retrieved_flag"] = None
+    st.session_state["class_1_prob"] = "N/A"
 
 def handle_submit_click(k):
     input_text = st.session_state[TEXT_KEY]
 
-    class_0_prob, class_1_prob = classify_text(input_text)
+    class_0_prob, class_1_prob = classify_text(input_text, model=st.session_state["classifier"])
 
     st.session_state["class_0_prob"] = class_0_prob
     st.session_state["class_1_prob"] = class_1_prob
@@ -69,47 +72,55 @@ def handle_submit_click(k):
 left_col, middle_col, right_col = st.columns(3)
 
 with left_col:
-    st.header("Documents")
+    st.subheader("Documents")
     with st.container(height=500):
         for doc in documents:
             st.write(doc)
             st.write("---")
 
 with middle_col:
-    st.header("Interaction")
+    st.subheader("New Document & Prompt")
     prompt = st.text_input("Prompt", value="Give me some camera recommendation for beginner", disabled=False)
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        k = st.slider("Number of Documents to Retrieve", min_value=1, max_value=10, value=5)
-    with col2:
-        col_21, col_22 = st.columns([1, 3])
-        with col_22:
-            st.session_state["model"] = st.radio(
-                "Select one:",
-                options=["gemini", "mistral"],
-                index=0
-            )
-    
+
     st.text_area(
         "New Document",
         key=TEXT_KEY,
-        height=250
+        height=350
     )
-
-    _, _, _, col4, col5= st.columns(5)
-    with col4:
+    _, _, _, col2, col3 = st.columns([2.5,1,1,1.3,1.5])
+    with col2:
         st.button("Reset", on_click=handle_reset_click)
-    with col5:
-        st.button("Submit", on_click=handle_submit_click, type="primary", args=(k,))
+    with col3:
+        st.button("Submit", on_click=handle_submit_click, type="primary", args=(st.session_state['k'],))
         
 
 with right_col:
+    st.subheader("Settings")
+
+    c1, c2, c3 = st.columns([2, 2, 1])
+    with c1:
+        st.session_state["model"] = st.segmented_control(
+            "Model",
+            options=["gemini", "mistral"],
+            default="gemini"
+        )
+    with c2:
+        st.session_state["classifier"] = st.segmented_control(
+            "Classifier",
+            options=["xgboost", "bert"],
+            default="xgboost"
+        )
+    
+
+    col1, col2, col3 = st.columns([2.5,1,1])
+    with col1:
+        st.session_state['k'] = st.slider("Number of Documents", min_value=1, max_value=10, value=5)
+
     st.subheader("LLM Output")
     st.text_area(
         "Output", 
         value=st.session_state[OUTPUT_KEY], 
-        height=300, 
+        height=100, 
         disabled=True, 
         label_visibility="collapsed"
     )
