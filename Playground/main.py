@@ -39,19 +39,21 @@ def handle_reset_click():
     st.session_state[OUTPUT_KEY] = "Output will appear here after submission."
     st.session_state["retrieved_flag"] = None
 
-def handle_submit_click():
+def handle_submit_click(k):
     input_text = st.session_state[TEXT_KEY]
     rag.add_document(input_text)
     
-    output = rag.query(prompt, model="gemini")
+    output = rag.query(prompt, model=st.session_state["model"], k=k)
     st.session_state[OUTPUT_KEY] = output
     
-    retrieved_docs = rag.retrieve_documents(prompt, k=5)
+    retrieved_docs = rag.retrieve_documents(prompt, k=k)
     
-    if any(input_text in doc for doc in retrieved_docs):
+    if input_text in retrieved_docs:
         st.session_state["retrieved_flag"] = True
+        st.session_state["retrieved_rank"] = retrieved_docs.index(input_text) + 1  # Get rank (1-based index)
     else:
         st.session_state["retrieved_flag"] = False
+        st.session_state["retrieved_rank"] = "N/A"  # Not retrieved
     
     rag.remove_document(input_text)
 
@@ -68,17 +70,30 @@ with middle_col:
     st.header("Interaction")
     prompt = st.text_input("Prompt", value="Give me some camera recommendation for beginner", disabled=False)
     
+    col1, col2 = st.columns(2)
+    with col1:
+        k = st.slider("Number of Documents to Retrieve (k)", min_value=1, max_value=10, value=5)
+    with col2:
+        col_21, col_22 = st.columns([1, 3])
+        with col_22:
+            st.session_state["model"] = st.radio(
+                "Select one:",
+                options=["gemini", "mistral"],
+                index=0
+            )
+    
     st.text_area(
         "New Document",
         key=TEXT_KEY,
         height=200
     )
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("Submit", on_click=handle_submit_click, type="primary")
-    with col2:
+    _, _, _, col4, col5= st.columns(5)
+    with col4:
         st.button("Reset", on_click=handle_reset_click)
+    with col5:
+        st.button("Submit", on_click=handle_submit_click, type="primary", args=(k,))
+        
 
 with right_col:
     st.subheader("LLM Output")
@@ -91,7 +106,11 @@ with right_col:
     )
     
     retrieved_flag = st.session_state.get("retrieved_flag", None)
+    retrieved_rank = st.session_state.get("retrieved_rank", "N/A")  # Default to "N/A"
+    
     if retrieved_flag is True:
         st.markdown("**New Document Retrieved:** ✅")
+        st.markdown(f"**Rank in Retrieved Documents:** {retrieved_rank}")
     elif retrieved_flag is False:
         st.markdown("**New Document Retrieved:** ❌")
+        st.markdown(f"**Rank in Retrieved Documents:** {retrieved_rank}")
