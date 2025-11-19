@@ -4,6 +4,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from RAG.RAG import RAG
+from Classifier.classification import classify_text
 
 rag = RAG()
 
@@ -41,7 +42,14 @@ def handle_reset_click():
 
 def handle_submit_click(k):
     input_text = st.session_state[TEXT_KEY]
-    rag.add_document(input_text)
+
+    class_0_prob, class_1_prob = classify_text(input_text)
+
+    st.session_state["class_0_prob"] = class_0_prob
+    st.session_state["class_1_prob"] = class_1_prob
+
+    if class_1_prob < 0.5:
+        rag.add_document(input_text)
     
     output = rag.query(prompt, model=st.session_state["model"], k=k)
     st.session_state[OUTPUT_KEY] = output
@@ -55,7 +63,8 @@ def handle_submit_click(k):
         st.session_state["retrieved_flag"] = False
         st.session_state["retrieved_rank"] = "N/A"  # Not retrieved
     
-    rag.remove_document(input_text)
+    if class_1_prob < 0.42:
+        rag.remove_document(input_text)
 
 left_col, middle_col, right_col = st.columns(3)
 
@@ -106,7 +115,7 @@ with right_col:
     )
     
     retrieved_flag = st.session_state.get("retrieved_flag", None)
-    retrieved_rank = st.session_state.get("retrieved_rank", "N/A")  # Default to "N/A"
+    retrieved_rank = st.session_state.get("retrieved_rank", "N/A")
     
     if retrieved_flag is True:
         st.markdown("**New Document Retrieved:** ✅")
@@ -117,3 +126,8 @@ with right_col:
     else:
         st.markdown("**New Document Retrieved:** Not Checked Yet")
         st.markdown(f"**Rank in Retrieved Documents:** {retrieved_rank}")
+    
+    class_0_prob = st.session_state.get("class_0_prob", "N/A")
+    class_1_prob = st.session_state.get("class_1_prob", "N/A")
+    
+    st.markdown(f"**Malicious Text Probability:** {class_1_prob}")
