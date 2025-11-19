@@ -1,0 +1,27 @@
+[project]
+name = "llm-rag-manipulation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "evaluate>=0.4.6",
+    "faiss-cpu>=1.13.0",
+    "google-auth>=2.43.0",
+    "google-genai>=1.51.0",
+    "huggingface-hub>=0.36.0",
+    "ipykernel>=7.1.0",
+    "ipython>=9.7.0",
+    "llama-cpp-python>=0.3.16",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.5",
+    "pandas>=2.3.3",
+    "python-dotenv>=1.2.1",
+    "scikit-learn>=1.7.2",
+    "sentence-transformers>=5.1.2",
+    "streamlit>=1.51.0",
+    "tokenizers>=0.22.1",
+    "torch>=2.9.1",
+    "transformers>=4.57.1",
+    "xgboost>=3.1.1",
+]
