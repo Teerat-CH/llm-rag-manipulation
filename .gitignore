@@ -5,6 +5,8 @@ __pycache__/
 
 *.pkl
 *.bin
+Classifier/XGBoost/xgboost_train.csv
+Classifier/XGBoost/xgboost_test.csv
 
 # C extensions
 *.so

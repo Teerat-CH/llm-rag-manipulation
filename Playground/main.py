@@ -61,7 +61,7 @@ left_col, middle_col, right_col = st.columns(3)
 
 with left_col:
     st.header("Documents")
-    with st.container(height=350):
+    with st.container(height=500):
         for doc in documents:
             st.write(doc)
             st.write("---")
@@ -72,7 +72,7 @@ with middle_col:
     
     col1, col2 = st.columns(2)
     with col1:
-        k = st.slider("Number of Documents to Retrieve (k)", min_value=1, max_value=10, value=5)
+        k = st.slider("Number of Documents to Retrieve", min_value=1, max_value=10, value=5)
     with col2:
         col_21, col_22 = st.columns([1, 3])
         with col_22:
@@ -85,7 +85,7 @@ with middle_col:
     st.text_area(
         "New Document",
         key=TEXT_KEY,
-        height=200
+        height=250
     )
 
     _, _, _, col4, col5= st.columns(5)
@@ -113,4 +113,7 @@ with right_col:
         st.markdown(f"**Rank in Retrieved Documents:** {retrieved_rank}")
     elif retrieved_flag is False:
         st.markdown("**New Document Retrieved:** ❌")
+        st.markdown(f"**Rank in Retrieved Documents:** {retrieved_rank}")
+    else:
+        st.markdown("**New Document Retrieved:** Not Checked Yet")
         st.markdown(f"**Rank in Retrieved Documents:** {retrieved_rank}")
