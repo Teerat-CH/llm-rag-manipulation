@@ -14,7 +14,7 @@ class RAG:
     def query(self, user_query: str, model="local", k=5):
         relevant_docs = self.index.search(user_query, k)
         context = "\n".join(relevant_docs)
-        instructions = "You are a helpful assistent, use the provided context to answer user's question as concise and accurately as possible. Say that you do not know if the answer is not contained in the context."
+        instructions = "You are a helpful assistent, use the provided context to answer user's question as concise and accurately as possible."
         prompt = f"Instructions:\n{instructions}\n\nContext:\n{context}\n\nQuestion: {user_query}\nAnswer:"
         response = generate_response(prompt, model=model)
         return response
